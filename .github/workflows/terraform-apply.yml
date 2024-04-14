@@ -22,7 +22,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Print repo 
-        run: echo github.repository
+        run: echo "$github.repository"
 
       # - name: Upload Configuration
       #   uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
