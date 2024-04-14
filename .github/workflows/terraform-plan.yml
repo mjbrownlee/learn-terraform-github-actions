@@ -11,16 +11,52 @@ env:
 
 jobs:
   terraform:
-    if: github.repository != 'hashicorp-education/learn-terraform-github-actions'
     name: "Terraform Plan"
     runs-on: ubuntu-latest
+    # Set the environment based on the target branch to allow us to reference appropriate environment variables. 
+    environment:
+      name: ${{ github.ref_name }}    
     permissions:
       contents: read
       pull-requests: write
+    strategy:
+      matrix:
+        location: ['AWSComponent1', 'AWSComponent2', 'AWSComponent3']
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
+      - id: set-branch-env
+        name: Set Environment for branch
+        run: |
+          if [[ ${{ github.ref_name }}  == 'main' ]]; then
+            echo "branch-env=development" >> "${GITHUB_OUTPUT}"
+          elif [[ ${{ github.ref_name }}  == 'prod-branch' ]]; then
+            echo "branch-env=production" >> "${GITHUB_OUTPUT}"
+            else
+            echo "branch-env=uat" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Check Terraform/AWS environment
+        run: echo "Terraform/AWS environment -> ${{ steps.set-branch-env.outputs.branch-env }}" 
+
+      - name: Detect Changes in Directories
+        uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          list-files: 'json'
+          filters: |
+            MW-AWSComponent1:
+              - 'app/AWSComponent1/**'
+              - 'infrastructure/AWSComponent1/**'
+            AWSComponent2:
+              - 'app/AWSComponent2/**'
+              - 'infrastructure/AWSComponent2/**'
+            AWSComponent3:
+              - 'app/AWSComponent3/**'
+              - 'infrastructure/AWSComponent3/**'
+    
       # - name: Upload Configuration
       #   uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
       #   id: plan-upload
