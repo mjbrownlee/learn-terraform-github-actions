@@ -61,6 +61,12 @@ jobs:
               - 'app/AWSComponent3/**'
               - 'infrastructure/AWSComponent3/**'
     
+      - name: Print Changes
+        run: echo ${{ steps.changes.outputs[matrix.location] }}
+
+      - name: Print True
+        run: echo ${{ steps.changes.outputs[matrix.location] == 'true' }} 
+
       # Set Terraform variables that are defined in variables.tf - https://github.com/hashicorp/setup-terraform/issues/35#issuecomment-689073412
       - name: Setup Terraform variables
         if: ${{ steps.changes.outputs[matrix.location] == 'true' }}
@@ -131,7 +137,7 @@ jobs:
               repo: context.repo.repo,
               body: output
             });
-            
+
       # - name: Upload Configuration
       #   uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
       #   id: plan-upload
