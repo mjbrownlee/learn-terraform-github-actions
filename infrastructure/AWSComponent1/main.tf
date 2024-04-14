@@ -24,4 +24,4 @@ resource "aws_ssm_parameter" "foo" {
     type = "String"
     value = "AWSComponent1 Value"
 }
-
+ 
