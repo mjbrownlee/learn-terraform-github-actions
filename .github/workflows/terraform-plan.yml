@@ -51,7 +51,7 @@ jobs:
         with:
           list-files: 'json'
           filters: |
-            MW-AWSComponent1:
+            AWSComponent1:
               - 'app/AWSComponent1/**'
               - 'infrastructure/AWSComponent1/**'
             AWSComponent2:
