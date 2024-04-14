@@ -24,6 +24,9 @@ jobs:
       - name: Print repo 
         run: echo "$github.repository"
 
+      - name: Another Print
+        run: echo "${{ github.ref_name }}"
+
       # - name: Upload Configuration
       #   uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
       #   id: apply-upload
