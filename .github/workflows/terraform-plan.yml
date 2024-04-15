@@ -31,6 +31,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check Terraform/AWS Environment
+        run: echo $ {{ vars.TFRESOURCESUFFIX }}
+        
       - id: set-branch-env
         name: Set Environment for branch
         run: |
