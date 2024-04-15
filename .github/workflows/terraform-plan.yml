@@ -2,7 +2,8 @@ name: "Terraform Plan"
 
 on:
   pull_request:
-
+    branches: ["development", "staging-uat", "main" ]
+    
 env:
   TF_CLOUD_ORGANIZATION: "mark_j_brownlee"
   TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
