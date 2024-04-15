@@ -66,7 +66,7 @@ jobs:
         uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
         id: plan-upload
         with:
-          workspace: ${{ matrix.location }}-${{ steps.set-branch-env.outputs.branch-env }} # change this once it's working
+          workspace: ${{ matrix.location }}-${{ vars.TFRESOURCESUFFIX }} 
           directory: infrastructure/${{ matrix.location }}
           speculative: true
 
@@ -75,7 +75,7 @@ jobs:
         uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0 
         id: plan-run
         with:
-          workspace: ${{ matrix.location }}-${{ steps.set-branch-env.outputs.branch-env }} # change this once it's working
+          workspace: ${{ matrix.location }}-${{ vars.TFRESOURCESUFFIX }}
           configuration_version: ${{ steps.plan-upload.outputs.configuration_version_id }}
           plan_only: true
 
