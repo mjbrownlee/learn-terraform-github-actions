@@ -67,7 +67,6 @@ jobs:
         with:
           workspace: ${{ matrix.location }}-${{ vars.TFRESOURCESUFFIX }} 
           directory: infrastructure/${{ matrix.location }}
-          speculative: true
 
       - name: Create Apply Run
         if: ${{ steps.changes.outputs[matrix.location] == 'true' }}
