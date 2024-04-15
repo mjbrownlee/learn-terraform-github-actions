@@ -19,7 +19,7 @@ provider "aws" {
   region = "us-east-2"
 }
 
-resource "aws_ssm_parameter" "foo" {
+resource "aws_ssm_parameter" "foo1" {
     name = "AWSComponent1"
     type = "String"
     value = "AWSComponent1 Value" 
