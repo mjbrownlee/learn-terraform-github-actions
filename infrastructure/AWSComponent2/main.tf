@@ -22,6 +22,6 @@ provider "aws" {
 resource "aws_ssm_parameter" "foo" {
     name = "AWSComponent2"
     type = "String"
-    value = "AWSComponent2 Value"
+    value = "AWSComponent2  Value"
 }
 
