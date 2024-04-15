@@ -2,8 +2,7 @@ name: "Terraform Apply"
 
 on:
   push:
-    branches:
-      - main
+    branches: ["development", "staging-uat", "main"]
 
 env:
   TF_CLOUD_ORGANIZATION: "mark_j_brownlee"
