@@ -30,9 +30,6 @@ jobs:
       - name: Check Terraform/AWS Environment
         run: echo "Terraform/AWS environment -> ${{ vars.TFRESOURCESUFFIX }}"
         
-      - name: Check Terraform/AWS environment
-        run: echo "Terraform/AWS environment -> ${{ steps.set-branch-env.outputs.branch-env }}" 
-
       - name: Detect Changes in Directories
         uses: dorny/paths-filter@v2.11.1
         id: changes
@@ -52,10 +49,9 @@ jobs:
       - name: Print Changes
         run: echo ${{ steps.changes.outputs[matrix.location] }}
 
-      - name: Print True
+      - name: Print True if there are changes
         run: echo ${{ steps.changes.outputs[matrix.location] == 'true' }} 
 
-      # Set Terraform variables that are defined in variables.tf - https://github.com/hashicorp/setup-terraform/issues/35#issuecomment-689073412
       - name: Setup Terraform variables
         if: ${{ steps.changes.outputs[matrix.location] == 'true' }}
         id: vars
