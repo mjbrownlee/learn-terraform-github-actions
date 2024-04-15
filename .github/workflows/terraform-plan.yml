@@ -28,22 +28,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Check Terraform/AWS Environment
-        run: echo ${{ vars.TFRESOURCESUFFIX }}
+        run: echo "Terraform/AWS environment -> ${{ vars.TFRESOURCESUFFIX }}
         
-      - id: set-branch-env
-        name: Set Environment for branch
-        run: |
-          if [[ ${{ github.ref_name }}  == 'main' ]]; then
-            echo "branch-env=development" >> "${GITHUB_OUTPUT}"
-          elif [[ ${{ github.ref_name }}  == 'prod-branch' ]]; then
-            echo "branch-env=production" >> "${GITHUB_OUTPUT}"
-            else
-            echo "branch-env=uat" >> "${GITHUB_OUTPUT}"
-          fi
-
-      - name: Check Terraform/AWS environment
-        run: echo "Terraform/AWS environment -> ${{ steps.set-branch-env.outputs.branch-env }}" 
-
       - name: Detect Changes in Directories
         uses: dorny/paths-filter@v2.11.1
         id: changes
@@ -63,10 +49,9 @@ jobs:
       - name: Print Changes
         run: echo ${{ steps.changes.outputs[matrix.location] }}
 
-      - name: Print True
+      - name: Print True if there are changes
         run: echo ${{ steps.changes.outputs[matrix.location] == 'true' }} 
 
-      # Set Terraform variables that are defined in variables.tf - https://github.com/hashicorp/setup-terraform/issues/35#issuecomment-689073412
       - name: Setup Terraform variables
         if: ${{ steps.changes.outputs[matrix.location] == 'true' }}
         id: vars
@@ -81,7 +66,7 @@ jobs:
         uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
         id: plan-upload
         with:
-          workspace: ${{ matrix.location }}-${{ steps.set-branch-env.outputs.branch-env }} # change this once it's working
+          workspace: ${{ matrix.location }}-${{ vars.TFRESOURCESUFFIX }}
           directory: infrastructure/${{ matrix.location }}
           speculative: true
 
@@ -90,7 +75,7 @@ jobs:
         uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0 
         id: plan-run
         with:
-          workspace: ${{ matrix.location }}-${{ steps.set-branch-env.outputs.branch-env }} # change this once it's working
+          workspace: ${{ matrix.location }}-${{ vars.TFRESOURCESUFFIX }}
           configuration_version: ${{ steps.plan-upload.outputs.configuration_version_id }}
           plan_only: true
 
