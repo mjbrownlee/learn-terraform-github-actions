@@ -63,7 +63,7 @@ jobs:
       - name: Upload Configuration
         if: ${{ steps.changes.outputs[matrix.location] == 'true' }}
         uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
-        id: plan-upload
+        id: apply-upload
         with:
           workspace: ${{ matrix.location }}-${{ vars.TFRESOURCESUFFIX }} 
           directory: infrastructure/${{ matrix.location }}
