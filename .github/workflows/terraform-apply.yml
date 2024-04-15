@@ -1,4 +1,4 @@
-name: "Terraform Apply"
+name: "Terraform Apply" 
 
 on:
   push:
@@ -69,23 +69,22 @@ jobs:
           directory: infrastructure/${{ matrix.location }}
           speculative: true
 
-    - name: Create Apply Run
-      if: ${{ steps.changes.outputs[matrix.location] == 'true' }}
-      uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
-      id: apply-run
-      with:
-        workspace: ${{ matrix.location }}-${{ vars.TFRESOURCESUFFIX }}
-        configuration_version: ${{ steps.apply-upload.outputs.configuration_version_id }}
+      - name: Create Apply Run
+        if: ${{ steps.changes.outputs[matrix.location] == 'true' }}
+        uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
+        id: apply-run
+        with:
+          workspace: ${{ matrix.location }}-${{ vars.TFRESOURCESUFFIX }}
+          configuration_version: ${{ steps.apply-upload.outputs.configuration_version_id }}
 
-    - name: Apply
-      if: ${{ steps.changes.outputs[matrix.location] == 'true' && fromJSON(steps.apply-run.outputs.payload).data.attributes.actions.IsConfirmable }}
-      uses: hashicorp/tfc-workflows-github/actions/apply-run@v1.0.0      
-      id: apply
-      with:
-        run: ${{ steps.apply-run.outputs.run_id }}
-        comment: "Apply Run from GitHub Actions CI ${{ github.sha }}"
+      - name: Apply
+        if: ${{ steps.changes.outputs[matrix.location] == 'true' && fromJSON(steps.apply-run.outputs.payload).data.attributes.actions.IsConfirmable }}
+        uses: hashicorp/tfc-workflows-github/actions/apply-run@v1.0.0      
+        id: apply
+        with:
+          run: ${{ steps.apply-run.outputs.run_id }}
+          comment: "Apply Run from GitHub Actions CI ${{ github.sha }}"
 
-        
       # - name: Upload Configuration
       #   uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
       #   id: apply-upload
