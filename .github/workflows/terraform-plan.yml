@@ -1,11 +1,7 @@
 name: "Terraform Plan"
 
 on:
-#  pull_request:
-  push:
-    branches:
-      - main
-
+  pull_request:
 
 env:
   TF_CLOUD_ORGANIZATION: "mark_j_brownlee"
@@ -16,8 +12,7 @@ env:
 jobs:
   terraform:
     name: "Terraform Plan"
-    runs-on: ubuntu-latest
-    # Set the environment based on the target branch to allow us to reference appropriate environment variables. 
+    runs-on: ubuntu-latest 
     environment:
       name: ${{ github.ref_name }}    
     permissions:
