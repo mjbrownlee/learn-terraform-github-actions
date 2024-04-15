@@ -1,10 +1,8 @@
 name: "Terraform Apply"
 
 on:
-  pull_request:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches: ["development", "staging-uat", "main"]
 
 env:
   TF_CLOUD_ORGANIZATION: "mark_j_brownlee"
@@ -16,17 +14,78 @@ jobs:
   terraform:
     name: "Terraform Apply"
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}    
     permissions:
       contents: read
+    strategy:
+      matrix:
+        location: ['AWSComponent1', 'AWSComponent2', 'AWSComponent3']
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - name: Print repo 
-        run: echo "${{ github.repository }}"
+        uses: actions/checkout@v4
 
-      - name: Another Print
-        run: echo "${{ github.ref_name }}"
+      - name: Check Terraform/AWS Environment
+        run: echo "Terraform/AWS environment -> ${{ vars.TFRESOURCESUFFIX }}"
+        
+      - name: Detect Changes in Directories
+        uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          list-files: 'json'
+          filters: |
+            AWSComponent1:
+              - 'app/AWSComponent1/**'
+              - 'infrastructure/AWSComponent1/**'
+            AWSComponent2:
+              - 'app/AWSComponent2/**'
+              - 'infrastructure/AWSComponent2/**'
+            AWSComponent3:
+              - 'app/AWSComponent3/**'
+              - 'infrastructure/AWSComponent3/**'
+    
+      - name: Print Changes
+        run: echo ${{ steps.changes.outputs[matrix.location] }}
 
+      - name: Print True if there are changes
+        run: echo ${{ steps.changes.outputs[matrix.location] == 'true' }} 
+
+      - name: Setup Terraform variables
+        if: ${{ steps.changes.outputs[matrix.location] == 'true' }}
+        id: vars
+        run: |-
+          cd infrastructure/${{ matrix.location }}
+          cat > pipeline.auto.tfvars <<EOF
+          environment = "${{ github.ref_name }}"
+          EOF
+
+      - name: Upload Configuration
+        if: ${{ steps.changes.outputs[matrix.location] == 'true' }}
+        uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
+        id: plan-upload
+        with:
+          workspace: ${{ matrix.location }}-${{ vars.TFRESOURCESUFFIX }} 
+          directory: infrastructure/${{ matrix.location }}
+          speculative: true
+
+    - name: Create Apply Run
+      if: ${{ steps.changes.outputs[matrix.location] == 'true' }}
+      uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
+      id: apply-run
+      with:
+        workspace: ${{ matrix.location }}-${{ vars.TFRESOURCESUFFIX }}
+        configuration_version: ${{ steps.apply-upload.outputs.configuration_version_id }}
+
+    - name: Apply
+      if: ${{ steps.changes.outputs[matrix.location] == 'true' && fromJSON(steps.apply-run.outputs.payload).data.attributes.actions.IsConfirmable }}
+      uses: hashicorp/tfc-workflows-github/actions/apply-run@v1.0.0      
+      id: apply
+      with:
+        run: ${{ steps.apply-run.outputs.run_id }}
+        comment: "Apply Run from GitHub Actions CI ${{ github.sha }}"
+
+        
       # - name: Upload Configuration
       #   uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
       #   id: apply-upload
