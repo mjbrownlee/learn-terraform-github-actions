@@ -46,7 +46,7 @@ jobs:
         run: echo "Terraform/AWS environment -> ${{ steps.set-branch-env.outputs.branch-env }}" 
 
       - name: Detect Changes in Directories
-        uses: dorny/paths-filter@v2.11.1
+        uses: dorny/paths-filter@v3.0.2
         id: changes
         with:
           list-files: 'json'
