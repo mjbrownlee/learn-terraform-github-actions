@@ -17,11 +17,11 @@ terraform {
 
 provider "aws" {
   region = "us-east-2"
-}
+} 
 
-resource "aws_ssm_parameter" "foo" {
-    name = "AWSComponent3"
+resource "aws_ssm_parameter" "foo3" {
+    name = "Component3"
     type = "String"
-    value = "AWSComponent3 Value" 
+    value = "AWSComponent3 Value"   
 }
 
